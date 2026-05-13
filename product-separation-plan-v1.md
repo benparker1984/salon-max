@@ -65,10 +65,13 @@ Completed in this pass:
 - Kept `/kado`, `/staff`, and `/check-in` as deployment shortcuts, not product architecture.
 - Added `/backoffice` as the online salon back office entry point.
 - Moved the gym customer/staff/check-in/state/checkout/webhook routes into `salonmax_products/gym_routes.py`.
+- Moved gym state storage, payment settings, checkout event saving, Stripe signature checking, and Stripe Checkout API calls into `salonmax_products/gym.py`.
+- Left thin compatibility wrappers in `app.py` so existing platform pages still call the same helper names while the product logic now lives behind the gym module boundary.
+- Added `salonmax_products/salon.py` and moved the first low-risk salon helpers into it: sunbed row preparation, business settings shaping, report date parsing, transaction-day rows, and best-seller rows.
 
 ## Next Pass
 
 - Move platform routes/helpers into a separate module or blueprint.
-- Move salon back-office routes/helpers into a separate module or blueprint.
-- Move remaining gym owner setup helpers and payment helpers out of `app.py`.
+- Continue moving salon back-office routes/helpers into `salonmax_products/salon.py` or a salon route module.
+- Move remaining gym owner setup pages/forms out of `app.py`.
 - Introduce proper persistent database storage before connecting live tills to hosted cloud.
