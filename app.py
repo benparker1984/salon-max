@@ -55,7 +55,100 @@ except ModuleNotFoundError:
             return "Gym"
 
     def register_gym_routes(app, deps):
-        raise RuntimeError("salonmax_products package is missing; upload the salonmax_products folder before deploying.")
+        """Minimal safety net so a missed package upload does not kill the app."""
+
+        def json_error(code, message, *, status=400):
+            return deps["json_error"](code, message, status=status)
+
+        def ensure_default_gym_business():
+            return deps["ensure_default_gym_business"]()
+
+        def default_gym_business_public_id():
+            return deps["default_gym_business_public_id"]()
+
+        def public_snapshot(business_account_public_id):
+            return deps["salonmax_public_gym_snapshot"](business_account_public_id)
+
+        def gym_surface(business_account_public_id, surface):
+            if business_account_public_id == default_gym_business_public_id():
+                ensure_default_gym_business()
+            snapshot = public_snapshot(business_account_public_id)
+            if snapshot is None:
+                return json_error("GYM_NOT_FOUND", "No gym signup site was found for that business account.", status=404)
+            return render_template(
+                "gym_access_portal.html",
+                snapshot=snapshot,
+                title=f"Join {snapshot['brand_name']}",
+                surface=surface,
+                notice=request.args.get("notice", "").strip(),
+            )
+
+        @app.route("/kado")
+        @app.route("/gym")
+        def default_gym_public_site():
+            if not gym_product.friendly_shortcuts_enabled():
+                return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
+            return redirect(url_for("salonmax_public_gym_site", business_account_public_id=ensure_default_gym_business()))
+
+        @app.route("/kado-health")
+        def kado_health_check():
+            business_account_public_id = ensure_default_gym_business()
+            snapshot = public_snapshot(business_account_public_id)
+            return jsonify(
+                {
+                    "ok": snapshot is not None,
+                    "business_account_public_id": business_account_public_id,
+                    "business_name": snapshot["business_name"] if snapshot else "",
+                    "brand_name": snapshot["brand_name"] if snapshot else "",
+                    "fallback_routes": True,
+                }
+            )
+
+        @app.route("/staff")
+        def default_gym_staff_shortcut():
+            if not gym_product.friendly_shortcuts_enabled():
+                return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
+            return redirect(url_for("salonmax_gym_staff_site", business_account_public_id=ensure_default_gym_business()))
+
+        @app.route("/check-in")
+        @app.route("/checkin")
+        def default_gym_reception_shortcut():
+            if not gym_product.friendly_shortcuts_enabled():
+                return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
+            return redirect(url_for("salonmax_gym_reception_site", business_account_public_id=ensure_default_gym_business()))
+
+        @app.route("/gym/<business_account_public_id>")
+        @app.route("/gym/<business_account_public_id>/join")
+        @app.route("/gym/<business_account_public_id>/customer")
+        def salonmax_public_gym_site(business_account_public_id):
+            return gym_surface(business_account_public_id, "customer")
+
+        @app.route("/gym/<business_account_public_id>/staff")
+        def salonmax_gym_staff_site(business_account_public_id):
+            if not session.get(deps["gym_staff_session_key"](business_account_public_id)):
+                return deps["gym_staff_login_redirect"](business_account_public_id)
+            return gym_surface(business_account_public_id, "staff")
+
+        @app.route("/gym/<business_account_public_id>/reception")
+        @app.route("/gym/<business_account_public_id>/check-in")
+        @app.route("/gym/<business_account_public_id>/checkin")
+        def salonmax_gym_reception_site(business_account_public_id):
+            if not session.get(deps["gym_staff_session_key"](business_account_public_id)):
+                return deps["gym_staff_login_redirect"](business_account_public_id)
+            return gym_surface(business_account_public_id, "reception")
+
+        @app.route("/gym/<business_account_public_id>/staff-login", methods=["GET", "POST"])
+        def salonmax_gym_staff_login(business_account_public_id):
+            snapshot = public_snapshot(business_account_public_id)
+            if snapshot is None:
+                return json_error("GYM_NOT_FOUND", "No gym signup site was found for that business account.", status=404)
+            return render_template(
+                "gym_staff_login.html",
+                snapshot=snapshot,
+                notice="The full gym route module is missing from this deployment. Upload salonmax_products/gym_routes.py.",
+                next_url=url_for("salonmax_gym_staff_site", business_account_public_id=business_account_public_id),
+                password_configured=False,
+            )
 
 
 BASE_DIR = Path(__file__).resolve().parent
