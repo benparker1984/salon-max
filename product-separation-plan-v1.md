@@ -64,10 +64,11 @@ Completed in this pass:
 - Added generic `/gym` default shortcut.
 - Kept `/kado`, `/staff`, and `/check-in` as deployment shortcuts, not product architecture.
 - Added `/backoffice` as the online salon back office entry point.
+- Moved the gym customer/staff/check-in/state/checkout/webhook routes into `salonmax_products/gym_routes.py`.
 
 ## Next Pass
 
-- Move gym routes/helpers into a separate module or blueprint.
 - Move platform routes/helpers into a separate module or blueprint.
 - Move salon back-office routes/helpers into a separate module or blueprint.
+- Move remaining gym owner setup helpers and payment helpers out of `app.py`.
 - Introduce proper persistent database storage before connecting live tills to hosted cloud.
