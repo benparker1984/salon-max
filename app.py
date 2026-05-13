@@ -171,6 +171,54 @@ def ensure_gym_checkout_events_table():
     )
 
 
+def ensure_default_kado_gym_business():
+    business_account_public_id = os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"
+    ensure_platform_sync_tables()
+    existing = platform_query_one(
+        "select id from cloud_business_accounts where business_account_public_id = ?",
+        (business_account_public_id,),
+    )
+    if existing is None:
+        platform_execute(
+            """
+            insert into cloud_business_accounts (
+                business_account_public_id,
+                business_name,
+                product_type,
+                status,
+                subscription_plan,
+                subscription_status,
+                contact_name,
+                contact_email,
+                contact_phone,
+                city,
+                postcode,
+                monthly_fee,
+                notes
+            ) values (?, 'KADO Fitness', 'gym', 'active', 'gym_access', 'trial', '', '', '', '', '', '100', ?)
+            """,
+            (
+                business_account_public_id,
+                "Auto-created for KADO Fitness public signup while the production database is being prepared.",
+            ),
+        )
+
+    ensure_gym_staff_auth_table()
+    auth = platform_query_one(
+        "select id from gym_staff_auth where business_account_public_id = ?",
+        (business_account_public_id,),
+    )
+    if auth is None:
+        platform_execute(
+            """
+            insert into gym_staff_auth (business_account_public_id, password_hash, updated_at)
+            values (?, ?, ?)
+            """,
+            (business_account_public_id, generate_password_hash("KadoStaff2026"), now_utc_text()),
+        )
+    return business_account_public_id
+
+
 def parse_utc_text(value):
     text = str(value or "").strip()
     if not text:
@@ -5994,6 +6042,8 @@ def salonmax_owner_gyms_snapshot():
 def salonmax_business_gym_access_snapshot(business_account_public_id: str):
     ensure_platform_sync_tables()
     ensure_gym_payment_settings_table()
+    if business_account_public_id == (os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"):
+        ensure_default_kado_gym_business()
     business = platform_query_one(
         "select * from cloud_business_accounts where business_account_public_id = ?",
         (business_account_public_id,),
@@ -6173,8 +6223,22 @@ def salonmax_create_gym_business():
 
 @app.route("/kado")
 def kado_public_gym_site():
-    business_account_public_id = os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"
+    business_account_public_id = ensure_default_kado_gym_business()
     return redirect(url_for("salonmax_public_gym_site", business_account_public_id=business_account_public_id))
+
+
+@app.route("/kado-health")
+def kado_health_check():
+    business_account_public_id = ensure_default_kado_gym_business()
+    snapshot = salonmax_public_gym_snapshot(business_account_public_id)
+    return jsonify(
+        {
+            "ok": snapshot is not None,
+            "business_account_public_id": business_account_public_id,
+            "business_name": snapshot["business_name"] if snapshot else "",
+            "brand_name": snapshot["brand_name"] if snapshot else "",
+        }
+    )
 
 
 @app.route("/gym/<business_account_public_id>/join")
@@ -6384,6 +6448,9 @@ def salonmax_owner_save_gym_payment_settings(business_account_public_id: str):
 
 
 def salonmax_gym_surface(business_account_public_id: str, surface: str):
+    kado_business_account_public_id = os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"
+    if business_account_public_id == kado_business_account_public_id:
+        ensure_default_kado_gym_business()
     snapshot = salonmax_public_gym_snapshot(business_account_public_id)
     if snapshot is None:
         return json_error("GYM_NOT_FOUND", "No gym signup site was found for that business account.", status=404)
