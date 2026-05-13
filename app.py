@@ -5916,35 +5916,51 @@ def run_app():
 
 
 def dashboard_totals():
+    def safe_value(sql, default=0):
+        try:
+            row = query_one(sql)
+        except sqlite3.Error:
+            return default
+        if row is None:
+            return default
+        return row["value"] if row["value"] is not None else default
+
     totals = {}
-    totals["customer_count"] = query_one("select count(*) as value from customers")["value"]
-    totals["active_staff_count"] = query_one(
+    totals["customer_count"] = safe_value("select count(*) as value from customers")
+    totals["active_staff_count"] = safe_value(
         "select count(*) as value from staff_users where is_active = 1"
-    )["value"]
-    totals["site_count"] = query_one("select count(*) as value from sites where is_active = 1")["value"]
-    totals["device_count"] = query_one(
+    )
+    totals["site_count"] = safe_value("select count(*) as value from sites where is_active = 1")
+    totals["device_count"] = safe_value(
         "select count(*) as value from devices where is_active = 1"
-    )["value"]
-    totals["open_till_count"] = query_one(
+    )
+    totals["open_till_count"] = safe_value(
         "select count(*) as value from till_sessions where status = 'open'"
-    )["value"]
-    totals["transaction_count"] = query_one("select count(*) as value from transactions")["value"]
-    totals["sales_total"] = query_one(
+    )
+    totals["transaction_count"] = safe_value("select count(*) as value from transactions")
+    totals["sales_total"] = safe_value(
         "select coalesce(sum(total_amount), 0) as value from transactions where status = 'completed'"
-    )["value"]
-    totals["package_minutes_total"] = query_one(
+    )
+    totals["package_minutes_total"] = safe_value(
         "select coalesce(sum(package_minutes), 0) as value from customers"
-    )["value"]
-    totals["account_balance_total"] = query_one(
+    )
+    totals["account_balance_total"] = safe_value(
         "select coalesce(sum(account_balance), 0) as value from customers"
-    )["value"]
-    totals["active_product_count"] = query_one(
+    )
+    totals["active_product_count"] = safe_value(
         "select count(*) as value from retail_products where is_active = 1"
-    )["value"]
-    totals["stock_units_total"] = query_one(
+    )
+    totals["stock_units_total"] = safe_value(
         "select coalesce(sum(stock_quantity), 0) as value from retail_products where is_active = 1"
-    )["value"]
+    )
     return totals
+
+
+def safe_backoffice_rows(sql):
+    try:
+        return query_all(sql)
+    except sqlite3.Error:
+        return []
 
 
 def product_group_rows():
@@ -6022,8 +6038,8 @@ def render_backoffice_dashboard():
     return render_template(
         "dashboard.html",
         totals=dashboard_totals(),
-        sites=query_all("select * from sites order by name"),
-        staff=query_all("select * from staff_users order by name limit 6"),
+        sites=safe_backoffice_rows("select * from sites order by name"),
+        staff=safe_backoffice_rows("select * from staff_users order by name limit 6"),
     )
 
 
@@ -6044,8 +6060,8 @@ def cloud_backoffice_dashboard():
     return render_template(
         "dashboard.html",
         totals=dashboard_totals(),
-        sites=query_all("select * from sites order by name"),
-        staff=query_all("select * from staff_users order by name limit 6"),
+        sites=safe_backoffice_rows("select * from sites order by name"),
+        staff=safe_backoffice_rows("select * from staff_users order by name limit 6"),
     )
 
 
