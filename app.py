@@ -5754,6 +5754,8 @@ def stock_adjustment_rows():
 
 @app.route("/")
 def dashboard():
+    if APP_ROLE == "cloud":
+        return redirect(url_for("kado_public_gym_site"))
     return render_template(
         "dashboard.html",
         totals=dashboard_totals(),
