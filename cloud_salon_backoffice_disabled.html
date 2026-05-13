@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Salon Back Office Not Enabled</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #e5eef8;
+            background:
+                radial-gradient(circle at top left, rgba(20, 184, 166, 0.35), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.25), transparent 28%),
+                #071827;
+        }
+        .card {
+            width: min(720px, calc(100vw - 32px));
+            padding: 32px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 24px;
+            background: rgba(15, 23, 42, 0.88);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+        }
+        .eyebrow {
+            color: #22d3ee;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        h1 {
+            margin: 10px 0 12px;
+            font-size: clamp(30px, 5vw, 46px);
+        }
+        p {
+            color: #bdd2f6;
+            line-height: 1.55;
+            font-size: 17px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        a {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: #06121f;
+            background: linear-gradient(135deg, #22d3ee, #38bdf8);
+            font-weight: 800;
+            text-decoration: none;
+        }
+        a.secondary {
+            color: #e5eef8;
+            background: rgba(148, 163, 184, 0.18);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <div class="eyebrow">Salon Max Cloud</div>
+        <h1>Salon back office is not enabled on this deployment.</h1>
+        <p>
+            This DigitalOcean app is currently being used for the KADO Fitness gym product.
+            The old salon back-office shell has been blocked here so gym and salon customer
+            systems do not get muddled together.
+        </p>
+        <p>
+            When we publish Salon Max back office properly, it should be a separate Salon Max
+            deployment/domain with its own database, not hidden inside the KADO app.
+        </p>
+        <div class="actions">
+            <a href="{{ url_for('salonmax_owner_console') }}">Open Salon Max Platform</a>
+            <a class="secondary" href="{{ url_for('default_gym_public_site') }}">Open KADO Fitness</a>
+        </div>
+    </main>
+</body>
+</html>

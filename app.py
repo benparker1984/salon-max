@@ -410,6 +410,10 @@ DATABASE_PATH = env_path("SALONMAX_DB_PATH", default_database_path())
 PLATFORM_DATABASE_PATH = env_path("SALONMAX_PLATFORM_DB_PATH", default_platform_database_path())
 
 
+def cloud_salon_backoffice_enabled() -> bool:
+    return os.environ.get("SALONMAX_ENABLE_CLOUD_SALON_BACKOFFICE", "").strip() == "1"
+
+
 def format_local_datetime(value) -> str:
     if not value:
         return ""
@@ -492,6 +496,12 @@ def require_platform_owner_login():
     if path in {"/platform-login", "/platform-logout"}:
         return None
     if session.get("platform_admin_authenticated"):
+        if (
+            protected_cloud_backoffice_path
+            and not cloud_salon_backoffice_enabled()
+            and path != "/backoffice"
+        ):
+            return redirect(url_for("cloud_backoffice_dashboard"))
         return None
     return platform_login_redirect()
 
@@ -6057,6 +6067,8 @@ def dashboard():
 
 @app.route("/backoffice")
 def cloud_backoffice_dashboard():
+    if APP_ROLE == "cloud" and not cloud_salon_backoffice_enabled():
+        return render_template("cloud_salon_backoffice_disabled.html")
     return render_template(
         "dashboard.html",
         totals=dashboard_totals(),

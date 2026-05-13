@@ -68,10 +68,12 @@ Completed in this pass:
 - Moved gym state storage, payment settings, checkout event saving, Stripe signature checking, and Stripe Checkout API calls into `salonmax_products/gym.py`.
 - Left thin compatibility wrappers in `app.py` so existing platform pages still call the same helper names while the product logic now lives behind the gym module boundary.
 - Added `salonmax_products/salon.py` and moved the first low-risk salon helpers into it: sunbed row preparation, business settings shaping, report date parsing, transaction-day rows, and best-seller rows.
+- Disabled the legacy `/backoffice` salon shell on cloud deployments unless `SALONMAX_ENABLE_CLOUD_SALON_BACKOFFICE=1` is deliberately set. This stops the KADO Fitness deployment from exposing broken salon back-office screens.
 
 ## Next Pass
 
 - Move platform routes/helpers into a separate module or blueprint.
 - Continue moving salon back-office routes/helpers into `salonmax_products/salon.py` or a salon route module.
 - Move remaining gym owner setup pages/forms out of `app.py`.
+- Create a separate hosted Salon Max back-office deployment/domain when we are ready, instead of running it inside the KADO Fitness app.
 - Introduce proper persistent database storage before connecting live tills to hosted cloud.
