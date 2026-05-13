@@ -1,0 +1,217 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 975 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(Salon Max Wiring Test Sheet) Tj
+T*
+() Tj
+T*
+(Goal: identify the correct command path and the correct feedback path for a future Raspberry Pi interface.) Tj
+T*
+() Tj
+T*
+(Working assumption) Tj
+T*
+(- Yellow/Blue + Red/Green are the likely command / relay drive wires.) Tj
+T*
+(- Black + White are the strongest candidate for feedback / status.) Tj
+T*
+(- Do not use the 230V side for Raspberry Pi feedback.) Tj
+T*
+(- Do not connect unknown 12V / 18V bed wiring directly to Pi GPIO.) Tj
+T*
+() Tj
+T*
+(For each state, record:) Tj
+T*
+(- Y/B to R/G volts) Tj
+T*
+(- Y/B to R/G continuity) Tj
+T*
+(- Black to White volts) Tj
+T*
+(- Black to White continuity) Tj
+T*
+(- Relay coil side volts) Tj
+T*
+(- Relay contact side volts) Tj
+T*
+(- Observed behaviour) Tj
+T*
+() Tj
+T*
+(States to test) Tj
+T*
+(1. Idle / bed not programmed) Tj
+T*
+(2. Bed started by till) Tj
+T*
+(3. Emergency stop pressed on bed) Tj
+T*
+(4. Stopped via till) Tj
+T*
+(5. Cooldown finished) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 1359 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(Recording sheet page 1) Tj
+T*
+() Tj
+T*
+(Idle / bed not programmed) Tj
+T*
+(Y/B to R/G volts: ____________________) Tj
+T*
+(Y/B to R/G continuity: ____________________) Tj
+T*
+(Black to White volts: ____________________) Tj
+T*
+(Black to White continuity: ____________________) Tj
+T*
+(Relay coil side volts: ____________________) Tj
+T*
+(Relay contact side volts: ____________________) Tj
+T*
+(Observed behaviour: _________________________________________________) Tj
+T*
+() Tj
+T*
+(Bed started by till) Tj
+T*
+(Y/B to R/G volts: ____________________) Tj
+T*
+(Y/B to R/G continuity: ____________________) Tj
+T*
+(Black to White volts: ____________________) Tj
+T*
+(Black to White continuity: ____________________) Tj
+T*
+(Relay coil side volts: ____________________) Tj
+T*
+(Relay contact side volts: ____________________) Tj
+T*
+(Observed behaviour: _________________________________________________) Tj
+T*
+() Tj
+T*
+(Emergency stop pressed on bed) Tj
+T*
+(Y/B to R/G volts: ____________________) Tj
+T*
+(Y/B to R/G continuity: ____________________) Tj
+T*
+(Black to White volts: ____________________) Tj
+T*
+(Black to White continuity: ____________________) Tj
+T*
+(Relay coil side volts: ____________________) Tj
+T*
+(Relay contact side volts: ____________________) Tj
+T*
+(Observed behaviour: _________________________________________________) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 1227 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(Recording sheet page 2) Tj
+T*
+() Tj
+T*
+(Stopped via till) Tj
+T*
+(Y/B to R/G volts: ____________________) Tj
+T*
+(Y/B to R/G continuity: ____________________) Tj
+T*
+(Black to White volts: ____________________) Tj
+T*
+(Black to White continuity: ____________________) Tj
+T*
+(Relay coil side volts: ____________________) Tj
+T*
+(Relay contact side volts: ____________________) Tj
+T*
+(Observed behaviour: _________________________________________________) Tj
+T*
+() Tj
+T*
+(Cooldown finished) Tj
+T*
+(Y/B to R/G volts: ____________________) Tj
+T*
+(Y/B to R/G continuity: ____________________) Tj
+T*
+(Black to White volts: ____________________) Tj
+T*
+(Black to White continuity: ____________________) Tj
+T*
+(Relay coil side volts: ____________________) Tj
+T*
+(Relay contact side volts: ____________________) Tj
+T*
+(Observed behaviour: _________________________________________________) Tj
+T*
+() Tj
+T*
+(Likely command pair: _______________________________________________) Tj
+T*
+(Likely feedback pair: ______________________________________________) Tj
+T*
+(Emergency stop visible on feedback path? ____________________________) Tj
+T*
+(Other notes: ______________________________________________________) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R] /Count 3 >>
+endobj
+9 0 obj
+<< /Type /Catalog /Pages 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000001105 00000 n 
+0000001231 00000 n 
+0000002642 00000 n 
+0000002768 00000 n 
+0000004047 00000 n 
+0000004173 00000 n 
+0000004242 00000 n 
+trailer
+<< /Size 10 /Root 9 0 R >>
+startxref
+4291
+%%EOF

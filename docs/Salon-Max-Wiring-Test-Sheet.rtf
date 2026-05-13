@@ -1,0 +1,100 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}}
+\fs22
+\b Salon Max Wiring Test Sheet\b0\par
+\par
+Goal: identify the correct command path and the correct feedback path for a future Raspberry Pi interface.\par
+\par
+\b Working assumption\b0\par
+\tab - Yellow/Blue + Red/Green are the likely command / relay drive wires.\par
+\tab - Black + White are the strongest candidate for feedback / status.\par
+\tab - Do not use the 230V side for Raspberry Pi feedback.\par
+\tab - Do not connect unknown 12V / 18V bed wiring directly to Pi GPIO.\par
+\par
+\b For each state, record\b0\par
+\tab - Y/B to R/G volts\par
+\tab - Y/B to R/G continuity\par
+\tab - Black to White volts\par
+\tab - Black to White continuity\par
+\tab - Relay coil side volts\par
+\tab - Relay contact side volts\par
+\tab - Observed behaviour\par
+\par
+\b Test states\b0\par
+1. Idle / bed not programmed\par
+2. Bed started by till\par
+3. Emergency stop pressed on bed\par
+4. Stopped via till\par
+5. Cooldown finished\par
+\par
+\b Recording Sheet\b0\par
+\par
+\b Idle / bed not programmed\b0\par
+Y/B to R/G volts: ____________________________________\par
+Y/B to R/G continuity: _______________________________\par
+Black to White volts: ________________________________\par
+Black to White continuity: ___________________________\par
+Relay coil side volts: _______________________________\par
+Relay contact side volts: ____________________________\par
+Observed behaviour: _________________________________________________\par
+\par
+\b Bed started by till\b0\par
+Y/B to R/G volts: ____________________________________\par
+Y/B to R/G continuity: _______________________________\par
+Black to White volts: ________________________________\par
+Black to White continuity: ___________________________\par
+Relay coil side volts: _______________________________\par
+Relay contact side volts: ____________________________\par
+Observed behaviour: _________________________________________________\par
+\par
+\b Emergency stop pressed on bed\b0\par
+Y/B to R/G volts: ____________________________________\par
+Y/B to R/G continuity: _______________________________\par
+Black to White volts: ________________________________\par
+Black to White continuity: ___________________________\par
+Relay coil side volts: _______________________________\par
+Relay contact side volts: ____________________________\par
+Observed behaviour: _________________________________________________\par
+\page
+\b Stopped via till\b0\par
+Y/B to R/G volts: ____________________________________\par
+Y/B to R/G continuity: _______________________________\par
+Black to White volts: ________________________________\par
+Black to White continuity: ___________________________\par
+Relay coil side volts: _______________________________\par
+Relay contact side volts: ____________________________\par
+Observed behaviour: _________________________________________________\par
+\par
+\b Cooldown finished\b0\par
+Y/B to R/G volts: ____________________________________\par
+Y/B to R/G continuity: _______________________________\par
+Black to White volts: ________________________________\par
+Black to White continuity: ___________________________\par
+Relay coil side volts: _______________________________\par
+Relay contact side volts: ____________________________\par
+Observed behaviour: _________________________________________________\par
+\par
+\b Wire identification per bed\b0\par
+Yellow / Blue goes to: _____________________________________________\par
+Red / Green goes to: _______________________________________________\par
+Black / White goes to: _____________________________________________\par
+Relay 230V side notes: _____________________________________________\par
+Sunbed loom side notes: ____________________________________________\par
+\par
+\b Emergency stop checks\b0\par
+Does the bed stop physically? ______________________________________\par
+Do fans continue? _________________________________________________\par
+Does Yellow/Blue to Red/Green change? ______________________________\par
+Does Black to White change? _______________________________________\par
+Does the relay change state? ______________________________________\par
+Does the till notice anything? ____________________________________\par
+\par
+\b Final notes\b0\par
+____________________________________________________________________\par
+____________________________________________________________________\par
+____________________________________________________________________\par
+\par
+Likely command pair: _______________________________________________\par
+Likely feedback pair: ______________________________________________\par
+Emergency stop visible on feedback path? ____________________________\par
+}

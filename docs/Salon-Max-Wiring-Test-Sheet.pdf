@@ -1,0 +1,232 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 1385 >>
+stream
+BT
+/F1 18 Tf
+50 800 Td
+(Salon Max Wiring Test Sheet) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Goal: identify the correct command path and the correct feedback path for a future Raspberry Pi interface.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Working assumption) Tj
+0 -22 Td
+(- Yellow/Blue + Red/Green are the most likely command / relay drive wires.) Tj
+0 -22 Td
+(- Black + White are the strongest candidate for a separate feedback / status path.) Tj
+0 -22 Td
+(- Do not use the 230V side for Raspberry Pi feedback.) Tj
+0 -22 Td
+(- Do not connect unknown 12V / 18V bed wiring directly to Pi GPIO.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Hand diagram file: C:/Users/benpa/Downloads/image0 \(12\).jpeg) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Record for each state below:) Tj
+0 -22 Td
+(- Yellow/Blue to Red/Green: voltage across pair and continuity across pair) Tj
+0 -22 Td
+(- Black to White: voltage across pair and continuity across pair) Tj
+0 -22 Td
+(- Relay coil side voltage) Tj
+0 -22 Td
+(- Relay contact side voltage) Tj
+0 -22 Td
+(- Observed behaviour: fans, lamps, bed starts, emergency stop effect, cooldown effect) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Test states) Tj
+0 -22 Td
+(1. Idle / bed not programmed) Tj
+0 -22 Td
+(2. Bed started by till) Tj
+0 -22 Td
+(3. Emergency stop pressed on bed) Tj
+0 -22 Td
+(4. Stopped via till) Tj
+0 -22 Td
+(5. Cooldown finished) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Use the next pages as a recording sheet.) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 1535 >>
+stream
+BT
+/F1 18 Tf
+50 800 Td
+(Recording Sheet) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(State 1: Idle / bed not programmed) Tj
+0 -22 Td
+(Y/B to R/G volts: ____________________) Tj
+0 -22 Td
+(Y/B to R/G continuity: ____________________) Tj
+0 -22 Td
+(Black to White volts: ____________________) Tj
+0 -22 Td
+(Black to White continuity: ____________________) Tj
+0 -22 Td
+(Relay coil side volts: ____________________) Tj
+0 -22 Td
+(Relay contact side volts: ____________________) Tj
+0 -22 Td
+(Observed behaviour: _________________________________________________) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(State 2: Bed started by till) Tj
+0 -22 Td
+(Y/B to R/G volts: ____________________) Tj
+0 -22 Td
+(Y/B to R/G continuity: ____________________) Tj
+0 -22 Td
+(Black to White volts: ____________________) Tj
+0 -22 Td
+(Black to White continuity: ____________________) Tj
+0 -22 Td
+(Relay coil side volts: ____________________) Tj
+0 -22 Td
+(Relay contact side volts: ____________________) Tj
+0 -22 Td
+(Observed behaviour: _________________________________________________) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(State 3: Emergency stop pressed on bed) Tj
+0 -22 Td
+(Y/B to R/G volts: ____________________) Tj
+0 -22 Td
+(Y/B to R/G continuity: ____________________) Tj
+0 -22 Td
+(Black to White volts: ____________________) Tj
+0 -22 Td
+(Black to White continuity: ____________________) Tj
+0 -22 Td
+(Relay coil side volts: ____________________) Tj
+0 -22 Td
+(Relay contact side volts: ____________________) Tj
+0 -22 Td
+(Observed behaviour: _________________________________________________) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 1852 >>
+stream
+BT
+/F1 18 Tf
+50 800 Td
+(Recording Sheet Continued) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(State 4: Stopped via till) Tj
+0 -22 Td
+(Y/B to R/G volts: ____________________) Tj
+0 -22 Td
+(Y/B to R/G continuity: ____________________) Tj
+0 -22 Td
+(Black to White volts: ____________________) Tj
+0 -22 Td
+(Black to White continuity: ____________________) Tj
+0 -22 Td
+(Relay coil side volts: ____________________) Tj
+0 -22 Td
+(Relay contact side volts: ____________________) Tj
+0 -22 Td
+(Observed behaviour: _________________________________________________) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(State 5: Cooldown finished) Tj
+0 -22 Td
+(Y/B to R/G volts: ____________________) Tj
+0 -22 Td
+(Y/B to R/G continuity: ____________________) Tj
+0 -22 Td
+(Black to White volts: ____________________) Tj
+0 -22 Td
+(Black to White continuity: ____________________) Tj
+0 -22 Td
+(Relay coil side volts: ____________________) Tj
+0 -22 Td
+(Relay contact side volts: ____________________) Tj
+0 -22 Td
+(Observed behaviour: _________________________________________________) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Wire identification per bed) Tj
+0 -22 Td
+(Yellow / Blue goes to: _____________________________________________) Tj
+0 -22 Td
+(Red / Green goes to: _______________________________________________) Tj
+0 -22 Td
+(Black / White goes to: _____________________________________________) Tj
+0 -22 Td
+(Relay 230V side notes: _____________________________________________) Tj
+0 -22 Td
+(Sunbed loom side notes: ____________________________________________) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Emergency stop visible on feedback path? ____________________________) Tj
+0 -22 Td
+(Likely command pair: _______________________________________________) Tj
+0 -22 Td
+(Likely feedback pair: ______________________________________________) Tj
+0 -22 Td
+(Other notes: ______________________________________________________) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R] /Count 3 >>
+endobj
+9 0 obj
+<< /Type /Catalog /Pages 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000001516 00000 n 
+0000001642 00000 n 
+0000003229 00000 n 
+0000003355 00000 n 
+0000005259 00000 n 
+0000005385 00000 n 
+0000005454 00000 n 
+trailer
+<< /Size 10 /Root 9 0 R >>
+startxref
+5503
+%%EOF

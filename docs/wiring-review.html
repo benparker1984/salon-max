@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Salon Max Wiring Test Sheet</title>
+  <style>
+    @page { size: A4; margin: 10mm; }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 9px;
+      line-height: 1.2;
+      color: #111;
+    }
+    h1 { font-size: 16px; margin: 0 0 4px; }
+    h2 { font-size: 11px; margin: 8px 0 4px; }
+    p, li { margin: 0 0 3px; }
+    ul { margin: 4px 0 6px 16px; padding: 0; }
+    .box {
+      border: 1px solid #999;
+      padding: 6px;
+      margin-bottom: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    img {
+      width: 100%;
+      height: auto;
+      border: 1px solid #999;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 4px;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    th { background: #eee; }
+    .fill td { height: 18px; }
+    .wide td { height: 30px; }
+    .page-break { break-before: page; }
+  </style>
+</head>
+<body>
+  <h1>Salon Max Wiring Test Sheet</h1>
+  <p>Goal: identify the correct command path and the correct feedback path for a future Raspberry Pi interface.</p>
+
+  <div class="grid">
+    <div class="box">
+      <h2>Working assumption</h2>
+      <ul>
+        <li>Yellow/Blue + Red/Green are the likely command / relay drive wires.</li>
+        <li>Black + White are the strongest candidate for feedback / status.</li>
+        <li>Do not use the 230V side for Raspberry Pi feedback.</li>
+        <li>Do not connect unknown 12V / 18V bed wiring directly to Pi GPIO.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h2>Hand diagram</h2>
+      <img src="file:///C:/Users/benpa/Downloads/image0%20(12).jpeg" alt="Wiring diagram">
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Measure this for every state</h2>
+    <ul>
+      <li>Yellow/Blue to Red/Green: voltage across pair and continuity across pair</li>
+      <li>Black to White: voltage across pair and continuity across pair</li>
+      <li>Relay coil side voltage</li>
+      <li>Relay contact side voltage</li>
+      <li>Observed behaviour: fans, lamps, start, stop, emergency stop, cooldown</li>
+    </ul>
+  </div>
+
+  <h2>State-by-state readings</h2>
+  <table class="fill">
+    <thead>
+      <tr>
+        <th style="width:16%;">State</th>
+        <th style="width:17%;">Y/B to R/G volts</th>
+        <th style="width:17%;">Y/B to R/G continuity</th>
+        <th style="width:17%;">Black to White volts</th>
+        <th style="width:17%;">Black to White continuity</th>
+        <th style="width:16%;">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Idle / not programmed</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Started by till</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Emergency stop on bed</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Stopped via till</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Cooldown finished</td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Relay-side checks</h2>
+  <table class="fill">
+    <thead>
+      <tr>
+        <th style="width:16%;">State</th>
+        <th style="width:21%;">Relay coil side volts</th>
+        <th style="width:21%;">Relay contact side volts</th>
+        <th style="width:18%;">Contact open / closed</th>
+        <th style="width:24%;">Observed behaviour</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Idle</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Running</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Emergency stop</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Till stop</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Cooldown finished</td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <h2>Wire identification per bed</h2>
+  <table class="wide">
+    <thead>
+      <tr>
+        <th style="width:16%;">Wire / pair</th>
+        <th style="width:22%;">Where it goes</th>
+        <th style="width:18%;">Likely job</th>
+        <th style="width:20%;">Measured voltage range</th>
+        <th style="width:24%;">Extra notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Yellow / Blue</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Red / Green</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Black / White</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Relay 230V side</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Sunbed loom side</td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Emergency stop checks</h2>
+  <table class="fill">
+    <thead>
+      <tr><th style="width:40%;">Question</th><th>Result</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Does the bed stop physically?</td><td></td></tr>
+      <tr><td>Do fans continue?</td><td></td></tr>
+      <tr><td>Does Yellow/Blue to Red/Green change?</td><td></td></tr>
+      <tr><td>Does Black to White change?</td><td></td></tr>
+      <tr><td>Does the relay change state?</td><td></td></tr>
+      <tr><td>Does the till notice anything?</td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Final notes</h2>
+  <table class="wide">
+    <tbody>
+      <tr><td style="height:40px;"></td></tr>
+      <tr><td style="height:40px;"></td></tr>
+      <tr><td style="height:40px;"></td></tr>
+    </tbody>
+  </table>
+</body>
+</html>
