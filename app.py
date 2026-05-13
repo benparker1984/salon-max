@@ -6243,6 +6243,19 @@ def kado_health_check():
     )
 
 
+@app.route("/staff")
+def kado_staff_shortcut():
+    business_account_public_id = ensure_default_kado_gym_business()
+    return redirect(url_for("salonmax_gym_staff_site", business_account_public_id=business_account_public_id))
+
+
+@app.route("/check-in")
+@app.route("/checkin")
+def kado_reception_shortcut():
+    business_account_public_id = ensure_default_kado_gym_business()
+    return redirect(url_for("salonmax_gym_reception_site", business_account_public_id=business_account_public_id))
+
+
 @app.route("/gym/<business_account_public_id>/join")
 @app.route("/gym/<business_account_public_id>/customer")
 def salonmax_public_gym_site(business_account_public_id: str):
