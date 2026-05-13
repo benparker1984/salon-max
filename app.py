@@ -17,6 +17,8 @@ from zoneinfo import ZoneInfo
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
+from salonmax_products import gym as gym_product
+
 
 BASE_DIR = Path(__file__).resolve().parent
 SCHEMA_PATH = BASE_DIR / "schema.sql"
@@ -306,19 +308,15 @@ def write_gym_business_state(business_account_public_id: str, state_data: dict):
 
 
 def default_gym_business_public_id() -> str:
-    return (
-        os.environ.get("SALONMAX_DEFAULT_GYM_BUSINESS_ID", "").strip()
-        or os.environ.get("KADO_GYM_BUSINESS_ID", "").strip()
-        or "biz_test-2"
-    )
+    return gym_product.default_business_public_id()
 
 
 def default_gym_business_name() -> str:
-    return os.environ.get("SALONMAX_DEFAULT_GYM_BUSINESS_NAME", "KADO Fitness").strip() or "KADO Fitness"
+    return gym_product.default_business_name()
 
 
 def default_gym_staff_password() -> str:
-    return os.environ.get("SALONMAX_DEFAULT_GYM_STAFF_PASSWORD", "KadoStaff2026").strip() or "KadoStaff2026"
+    return gym_product.default_staff_password()
 
 
 def ensure_default_gym_business():
@@ -5921,7 +5919,7 @@ def render_backoffice_dashboard():
 @app.route("/")
 def dashboard():
     if APP_ROLE == "cloud":
-        cloud_home = os.environ.get("SALONMAX_CLOUD_HOME", "default_gym").strip().lower()
+        cloud_home = gym_product.cloud_home_target()
         if cloud_home == "platform":
             return redirect(url_for("salonmax_owner_console"))
         if cloud_home == "backoffice":
@@ -6312,7 +6310,7 @@ def salonmax_public_gym_snapshot(business_account_public_id: str):
 
     brand_name = str(snapshot["business_name"] or "").strip()
     if not brand_name or brand_name.lower().startswith(("test", "imported biz_test")):
-        brand_name = default_gym_business_name() if business_account_public_id == default_gym_business_public_id() else "Gym"
+        brand_name = gym_product.fallback_brand_name(business_account_public_id)
 
     return {
         **snapshot,
@@ -6401,12 +6399,16 @@ def salonmax_create_gym_business():
 
 @app.route("/kado")
 def kado_public_gym_site():
+    if not gym_product.friendly_shortcuts_enabled():
+        return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
     business_account_public_id = ensure_default_gym_business()
     return redirect(url_for("salonmax_public_gym_site", business_account_public_id=business_account_public_id))
 
 
 @app.route("/gym")
 def default_gym_public_site():
+    if not gym_product.friendly_shortcuts_enabled():
+        return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
     business_account_public_id = ensure_default_gym_business()
     return redirect(url_for("salonmax_public_gym_site", business_account_public_id=business_account_public_id))
 
@@ -6427,6 +6429,8 @@ def kado_health_check():
 
 @app.route("/staff")
 def default_gym_staff_shortcut():
+    if not gym_product.friendly_shortcuts_enabled():
+        return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
     business_account_public_id = ensure_default_gym_business()
     return redirect(url_for("salonmax_gym_staff_site", business_account_public_id=business_account_public_id))
 
@@ -6434,6 +6438,8 @@ def default_gym_staff_shortcut():
 @app.route("/check-in")
 @app.route("/checkin")
 def default_gym_reception_shortcut():
+    if not gym_product.friendly_shortcuts_enabled():
+        return json_error("SHORTCUT_DISABLED", "This gym shortcut is disabled for this deployment.", status=404)
     business_account_public_id = ensure_default_gym_business()
     return redirect(url_for("salonmax_gym_reception_site", business_account_public_id=business_account_public_id))
 

@@ -56,8 +56,10 @@ Salon product:
 Completed in this pass:
 
 - Added generic default gym helpers.
+- Moved the gym deployment defaults into `salonmax_products/gym.py` so KADO-specific behaviour is no longer embedded directly in `app.py`.
 - Kept `KADO_GYM_BUSINESS_ID` as a backwards-compatible deploy setting only.
 - Added `SALONMAX_DEFAULT_GYM_BUSINESS_ID`, `SALONMAX_DEFAULT_GYM_BUSINESS_NAME`, and `SALONMAX_DEFAULT_GYM_STAFF_PASSWORD`.
+- Added `SALONMAX_GYM_FRIENDLY_SHORTCUTS=0` option so generic deployments can disable `/kado`, `/staff`, `/check-in`, and `/gym` shortcuts.
 - Added canonical `/gym/<business_account_public_id>/check-in` route.
 - Added generic `/gym` default shortcut.
 - Kept `/kado`, `/staff`, and `/check-in` as deployment shortcuts, not product architecture.
