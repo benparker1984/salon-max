@@ -17,7 +17,41 @@ from zoneinfo import ZoneInfo
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from salonmax_products import gym as gym_product
+try:
+    from salonmax_products import gym as gym_product
+except ModuleNotFoundError:
+    class gym_product:
+        """Temporary fallback if a deploy misses the salonmax_products package."""
+
+        @staticmethod
+        def default_business_public_id() -> str:
+            return (
+                os.environ.get("SALONMAX_DEFAULT_GYM_BUSINESS_ID", "").strip()
+                or os.environ.get("KADO_GYM_BUSINESS_ID", "").strip()
+                or "biz_test-2"
+            )
+
+        @staticmethod
+        def default_business_name() -> str:
+            return os.environ.get("SALONMAX_DEFAULT_GYM_BUSINESS_NAME", "KADO Fitness").strip() or "KADO Fitness"
+
+        @staticmethod
+        def default_staff_password() -> str:
+            return os.environ.get("SALONMAX_DEFAULT_GYM_STAFF_PASSWORD", "KadoStaff2026").strip() or "KadoStaff2026"
+
+        @staticmethod
+        def friendly_shortcuts_enabled() -> bool:
+            return os.environ.get("SALONMAX_GYM_FRIENDLY_SHORTCUTS", "1").strip() != "0"
+
+        @staticmethod
+        def cloud_home_target() -> str:
+            return os.environ.get("SALONMAX_CLOUD_HOME", "default_gym").strip().lower() or "default_gym"
+
+        @staticmethod
+        def fallback_brand_name(business_account_public_id: str) -> str:
+            if business_account_public_id == gym_product.default_business_public_id():
+                return gym_product.default_business_name()
+            return "Gym"
 
 
 BASE_DIR = Path(__file__).resolve().parent
