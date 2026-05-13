@@ -69,6 +69,11 @@ def format_local_datetime(value) -> str:
 app.jinja_env.filters["localdt"] = format_local_datetime
 
 
+@app.context_processor
+def inject_app_role():
+    return {"app_role": APP_ROLE}
+
+
 def now_utc_text() -> str:
     return datetime.now(ZoneInfo("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -102,12 +107,31 @@ def gym_staff_login_redirect(business_account_public_id: str):
     return redirect(url_for("salonmax_gym_staff_login", business_account_public_id=business_account_public_id, next=request.full_path.rstrip("?")))
 
 
+SALON_BACKOFFICE_CLOUD_PATHS = (
+    "/backoffice",
+    "/business-settings",
+    "/sunbed-settings",
+    "/customers",
+    "/staff/create",
+    "/pricing",
+    "/packages",
+    "/store",
+    "/transactions",
+    "/till-sessions",
+    "/reports",
+)
+
+
 @app.before_request
 def require_platform_owner_login():
     path = request.path or ""
     if platform_auth_disabled():
         return None
-    if not (path == "/salonmax-platform" or path.startswith("/platform")):
+    protected_platform_path = path == "/salonmax-platform" or path.startswith("/platform")
+    protected_cloud_backoffice_path = APP_ROLE == "cloud" and any(
+        path == prefix or path.startswith(f"{prefix}/") for prefix in SALON_BACKOFFICE_CLOUD_PATHS
+    )
+    if not (protected_platform_path or protected_cloud_backoffice_path):
         return None
     if path in {"/platform-login", "/platform-logout"}:
         return None
@@ -5862,10 +5886,24 @@ def stock_adjustment_rows():
     )
 
 
+def render_backoffice_dashboard():
+    return render_template(
+        "dashboard.html",
+        totals=dashboard_totals(),
+        sites=query_all("select * from sites order by name"),
+        staff=query_all("select * from staff_users order by name limit 6"),
+    )
+
+
 @app.route("/")
 def dashboard():
     if APP_ROLE == "cloud":
         return redirect(url_for("kado_public_gym_site"))
+    return render_backoffice_dashboard()
+
+
+@app.route("/backoffice")
+def cloud_backoffice_dashboard():
     return render_template(
         "dashboard.html",
         totals=dashboard_totals(),
@@ -8801,6 +8839,11 @@ def staff():
     return render_template("staff.html", staff_rows=query_all("select * from staff_users order by name"))
 
 
+@app.route("/backoffice/staff")
+def backoffice_staff():
+    return staff()
+
+
 @app.post("/staff/create")
 def create_staff():
     name = request.form.get("name", "").strip()
@@ -8808,13 +8851,13 @@ def create_staff():
     role = request.form.get("role", "staff").strip() or "staff"
 
     if not name or not pin_code:
-        return redirect(url_for("staff"))
+        return redirect(url_for("backoffice_staff") if APP_ROLE == "cloud" else url_for("staff"))
 
     execute(
         "insert into staff_users (name, pin_code, role, is_active) values (?, ?, ?, 1)",
         (name, pin_code, role),
     )
-    return redirect(url_for("staff"))
+    return redirect(url_for("backoffice_staff") if APP_ROLE == "cloud" else url_for("staff"))
 
 
 @app.route("/pricing")
