@@ -171,6 +171,116 @@ def ensure_gym_checkout_events_table():
     )
 
 
+def gym_state_database_url() -> str:
+    return (
+        os.environ.get("SALONMAX_DATABASE_URL", "").strip()
+        or os.environ.get("DATABASE_URL", "").strip()
+    )
+
+
+def gym_state_pg_connect():
+    database_url = gym_state_database_url()
+    if not database_url:
+        return None
+    try:
+        import psycopg
+        from psycopg.rows import dict_row
+    except ImportError:
+        return None
+    return psycopg.connect(database_url, row_factory=dict_row)
+
+
+def ensure_gym_state_table():
+    pg_connection = gym_state_pg_connect()
+    if pg_connection is not None:
+        with pg_connection:
+            pg_connection.execute(
+                """
+                create table if not exists gym_business_state (
+                    business_account_public_id text primary key,
+                    state_json jsonb not null,
+                    updated_at timestamptz not null default now()
+                )
+                """
+            )
+        return
+
+    platform_execute(
+        """
+        create table if not exists gym_business_state (
+            business_account_public_id text primary key,
+            state_json text not null,
+            updated_at text not null
+        )
+        """
+    )
+
+
+def read_gym_business_state(business_account_public_id: str):
+    ensure_gym_state_table()
+    pg_connection = gym_state_pg_connect()
+    if pg_connection is not None:
+        with pg_connection:
+            row = pg_connection.execute(
+                """
+                select state_json
+                from gym_business_state
+                where business_account_public_id = %s
+                """,
+                (business_account_public_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return row["state_json"]
+
+    row = platform_query_one(
+        """
+        select state_json
+        from gym_business_state
+        where business_account_public_id = ?
+        """,
+        (business_account_public_id,),
+    )
+    if row is None:
+        return None
+    try:
+        return json.loads(row["state_json"])
+    except json.JSONDecodeError:
+        return None
+
+
+def write_gym_business_state(business_account_public_id: str, state_data: dict):
+    ensure_gym_state_table()
+    state_json = json.dumps(state_data, separators=(",", ":"), sort_keys=True)
+    if len(state_json) > 2_000_000:
+        return False
+
+    pg_connection = gym_state_pg_connect()
+    if pg_connection is not None:
+        with pg_connection:
+            pg_connection.execute(
+                """
+                insert into gym_business_state (business_account_public_id, state_json, updated_at)
+                values (%s, %s::jsonb, now())
+                on conflict (business_account_public_id)
+                do update set state_json = excluded.state_json, updated_at = now()
+                """,
+                (business_account_public_id, state_json),
+            )
+        return True
+
+    platform_execute(
+        """
+        insert into gym_business_state (business_account_public_id, state_json, updated_at)
+        values (?, ?, ?)
+        on conflict(business_account_public_id)
+        do update set state_json = excluded.state_json, updated_at = excluded.updated_at
+        """,
+        (business_account_public_id, state_json, now_utc_text()),
+    )
+    return True
+
+
 def ensure_default_kado_gym_business():
     business_account_public_id = os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"
     ensure_platform_sync_tables()
@@ -6260,6 +6370,39 @@ def kado_reception_shortcut():
 @app.route("/gym/<business_account_public_id>/customer")
 def salonmax_public_gym_site(business_account_public_id: str):
     return salonmax_gym_surface(business_account_public_id, "customer")
+
+
+@app.get("/gym/<business_account_public_id>/state")
+def salonmax_gym_state_get(business_account_public_id: str):
+    kado_business_account_public_id = os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"
+    if business_account_public_id == kado_business_account_public_id:
+        ensure_default_kado_gym_business()
+    if salonmax_public_gym_snapshot(business_account_public_id) is None:
+        return json_error("GYM_NOT_FOUND", "No gym signup site was found for that business account.", status=404)
+    return jsonify(
+        {
+            "ok": True,
+            "business_account_public_id": business_account_public_id,
+            "state": read_gym_business_state(business_account_public_id),
+            "storage": "postgres" if gym_state_database_url() else "sqlite",
+        }
+    )
+
+
+@app.post("/gym/<business_account_public_id>/state")
+def salonmax_gym_state_save(business_account_public_id: str):
+    kado_business_account_public_id = os.environ.get("KADO_GYM_BUSINESS_ID", "biz_test-2").strip() or "biz_test-2"
+    if business_account_public_id == kado_business_account_public_id:
+        ensure_default_kado_gym_business()
+    if salonmax_public_gym_snapshot(business_account_public_id) is None:
+        return json_error("GYM_NOT_FOUND", "No gym signup site was found for that business account.", status=404)
+    payload = request.get_json(silent=True) or {}
+    state_data = payload.get("state")
+    if not isinstance(state_data, dict):
+        return json_error("INVALID_STATE", "Gym state must be a JSON object.", status=400)
+    if not write_gym_business_state(business_account_public_id, state_data):
+        return json_error("STATE_TOO_LARGE", "Gym state is too large to save safely.", status=413)
+    return jsonify({"ok": True, "storage": "postgres" if gym_state_database_url() else "sqlite"})
 
 
 @app.route("/gym/<business_account_public_id>/reception")
