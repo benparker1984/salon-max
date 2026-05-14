@@ -65,7 +65,7 @@
 </head>
 <body>
     <main class="card">
-        <div class="eyebrow">Salon Max Cloud</div>
+        <div class="eyebrow">{{ provider_console_brand }} Cloud</div>
         <h1>This is the old single-salon back office.</h1>
         <p>
             This page is not the Salon Max owner platform and it is not attached to one
@@ -78,8 +78,13 @@
             a selected business account, for example a future business-specific back-office link.
         </p>
         <div class="actions">
+            {% if is_gym_mode %}
+            <a href="{{ url_for('salonmax_owner_gyms') }}">Open GYM Max Admin</a>
+            <a class="secondary" href="{{ url_for('default_gym_public_site') }}">Open Public Gym Site</a>
+            {% else %}
             <a href="{{ url_for('salonmax_owner_console') }}">Open Salon Max Platform</a>
             <a class="secondary" href="{{ url_for('salonmax_platform_login') }}">Provider Login</a>
+            {% endif %}
         </div>
     </main>
 </body>

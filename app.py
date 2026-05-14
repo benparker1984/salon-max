@@ -6528,6 +6528,8 @@ def salonmax_public_gym_snapshot(business_account_public_id: str):
 
 @app.route("/platform/gyms")
 def salonmax_owner_gyms():
+    if not gym_only_cloud_deployment():
+        return redirect(url_for("salonmax_owner_console", notice="GYM Max is now managed in its own platform."))
     return render_template(
         "salonmax_gyms.html",
         snapshot=salonmax_owner_gyms_snapshot(),
@@ -6538,6 +6540,8 @@ def salonmax_owner_gyms():
 
 @app.post("/platform/gyms/create")
 def salonmax_create_gym_business():
+    if not gym_only_cloud_deployment():
+        return redirect(url_for("salonmax_owner_console", notice="GYM Max is now managed in its own platform."))
     ensure_platform_sync_tables()
     business_name = request.form.get("business_name", "").strip()
     subscription_status = request.form.get("subscription_status", "").strip() or "trial"
@@ -6602,6 +6606,8 @@ def salonmax_create_gym_business():
 
 @app.post("/platform/business/<business_account_public_id>/gym-access/staff-password")
 def salonmax_owner_reset_gym_staff_password(business_account_public_id: str):
+    if not gym_only_cloud_deployment():
+        return redirect(url_for("salonmax_owner_console", notice="GYM Max is now managed in its own platform."))
     snapshot = salonmax_business_gym_access_snapshot(business_account_public_id)
     if snapshot is None:
         return json_error("BUSINESS_NOT_FOUND", "No Salon Max business account was found for that id.", status=404)
@@ -6643,6 +6649,8 @@ def salonmax_owner_reset_gym_staff_password(business_account_public_id: str):
 
 @app.post("/platform/business/<business_account_public_id>/gym-access/payment-settings")
 def salonmax_owner_save_gym_payment_settings(business_account_public_id: str):
+    if not gym_only_cloud_deployment():
+        return redirect(url_for("salonmax_owner_console", notice="GYM Max is now managed in its own platform."))
     snapshot = salonmax_business_gym_access_snapshot(business_account_public_id)
     if snapshot is None:
         return json_error("BUSINESS_NOT_FOUND", "No Salon Max business account was found for that id.", status=404)
@@ -6759,6 +6767,8 @@ register_gym_routes(
 
 @app.route("/platform/business/<business_account_public_id>/gym-access")
 def salonmax_owner_business_gym_access(business_account_public_id: str):
+    if not gym_only_cloud_deployment():
+        return redirect(url_for("salonmax_owner_console", notice="GYM Max is now managed in its own platform."))
     snapshot = salonmax_business_gym_access_snapshot(business_account_public_id)
     if snapshot is None:
         return json_error("BUSINESS_NOT_FOUND", "No Salon Max business account was found for that id.", status=404)
