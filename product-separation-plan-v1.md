@@ -66,9 +66,11 @@ Every salon business setting now includes `hardware_controller_type` so we can a
 
 Hosted apps now need an explicit product boundary so KADO/gym and Salon Max/salon do not leak into each other.
 
-- `SALONMAX_PRODUCT_MODE=gym` makes the deployment gym-only. It keeps `/`, `/kado`, `/staff`, `/check-in`, and `/gym/...` available, but redirects Salon Max platform/backoffice pages away from the gym app.
+- `SALONMAX_PRODUCT_MODE=gym` makes the deployment gym-only. It keeps `/`, `/kado`, `/staff`, `/check-in`, `/gym/...`, and the focused GYM Max admin routes available, but redirects Salon Max salon/backoffice pages away from the gym app.
 - `SALONMAX_PRODUCT_MODE=salon` keeps the Salon Max platform/backoffice routes available for the salon product.
 - If `SALONMAX_PRODUCT_MODE` is not set, `SALONMAX_CLOUD_HOME=default_gym`, `gym`, or `kado` is treated as gym-only for backwards compatibility.
+- Gym-only deployments are branded as `GYM Max` and keep only focused gym admin routes: gym onboarding, gym account directory, staff password recovery, public joining links, reception check-in links, and payment setup.
+- Salon-specific owner tools such as sunbed management, till diagnostics, terminal licences, salon transactions, tanning analytics, and salon customer ledgers are blocked from gym-only deployments.
 
 ## Rules
 
@@ -95,7 +97,8 @@ Completed in this pass:
 - Left thin compatibility wrappers in `app.py` so existing platform pages still call the same helper names while the product logic now lives behind the gym module boundary.
 - Added `salonmax_products/salon.py` and moved the first low-risk salon helpers into it: sunbed row preparation, business settings shaping, report date parsing, transaction-day rows, and best-seller rows.
 - Disabled the legacy `/backoffice` salon shell on cloud deployments unless `SALONMAX_ENABLE_CLOUD_SALON_BACKOFFICE=1` is deliberately set. This stops the KADO Fitness deployment from exposing broken salon back-office screens.
-- Added a gym-only deployment guard so KADO-style hosted apps redirect `/platform`, `/platform-login`, and salon backoffice URLs back to the gym public site.
+- Added a first gym-only deployment guard so KADO-style hosted apps stopped exposing the full Salon Max platform and salon backoffice URLs.
+- Reworked the gym-only deployment guard into a GYM Max owner/admin surface: `/platform-login`, `/platform/gyms`, and `/platform/business/<id>/gym-access` remain available, while salon/tanning management routes are redirected or rejected.
 
 ## Next Pass
 

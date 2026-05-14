@@ -429,6 +429,18 @@ def gym_only_cloud_deployment() -> bool:
     return APP_ROLE == "cloud" and cloud_product_mode() in {"gym", "kado"}
 
 
+def gym_management_platform_path(path: str) -> bool:
+    if path in {"/platform", "/platform/owner", "/platform/gyms", "/platform-login", "/platform-logout"}:
+        return True
+    if path == "/salonmax-platform":
+        return True
+    if path.startswith("/platform/gyms/"):
+        return True
+    if path.startswith("/platform/business/") and "/gym-access" in path:
+        return True
+    return False
+
+
 def format_local_datetime(value) -> str:
     if not value:
         return ""
@@ -446,7 +458,15 @@ app.jinja_env.filters["localdt"] = format_local_datetime
 
 @app.context_processor
 def inject_app_role():
-    return {"app_role": APP_ROLE}
+    product_mode = cloud_product_mode()
+    is_gym_mode = gym_only_cloud_deployment()
+    return {
+        "app_role": APP_ROLE,
+        "product_mode": product_mode,
+        "is_gym_mode": is_gym_mode,
+        "provider_console_brand": "GYM Max" if is_gym_mode else "Salon Max",
+        "provider_console_title": "GYM Max Admin" if is_gym_mode else "Salon Max Platform",
+    }
 
 
 def now_utc_text() -> str:
@@ -511,9 +531,18 @@ def require_platform_owner_login():
         or protected_cloud_backoffice_path
         or path in {"/platform-login", "/platform-logout", "/salonmax-platform"}
     ):
+        if gym_management_platform_path(path):
+            pass
+        elif path == "/platform" or path == "/platform/owner" or path == "/salonmax-platform":
+            return redirect(url_for("salonmax_owner_gyms"))
+        else:
+            if request.method in {"GET", "HEAD"}:
+                return redirect(url_for("salonmax_owner_gyms"))
+            return json_error("GYM_ONLY_DEPLOYMENT", "Salon Max salon routes are disabled on this GYM Max deployment.", status=404)
+    if gym_only_cloud_deployment() and protected_cloud_backoffice_path:
         if request.method in {"GET", "HEAD"}:
-            return redirect(url_for("default_gym_public_site"))
-        return json_error("GYM_ONLY_DEPLOYMENT", "Salon Max platform routes are disabled on this gym deployment.", status=404)
+            return redirect(url_for("salonmax_owner_gyms"))
+        return json_error("GYM_ONLY_DEPLOYMENT", "Salon Max salon routes are disabled on this GYM Max deployment.", status=404)
     if not (protected_platform_path or protected_cloud_backoffice_path):
         return None
     if path in {"/platform-login", "/platform-logout"}:
@@ -2713,7 +2742,7 @@ def salonmax_business_accounts_snapshot(search_text: str = ""):
             }
         )
     return {
-        "platform_name": "Salon Max",
+        "platform_name": "GYM Max" if gym_only_cloud_deployment() else "Salon Max",
         "search_text": search_text,
         "business_count": len(businesses),
         "healthy_terminal_total": healthy_terminal_total,
@@ -6084,7 +6113,7 @@ def dashboard():
     if APP_ROLE == "cloud":
         cloud_home = gym_product.cloud_home_target()
         if cloud_home == "platform":
-            return redirect(url_for("salonmax_owner_console"))
+            return redirect(url_for("salonmax_owner_gyms" if gym_only_cloud_deployment() else "salonmax_owner_console"))
         if cloud_home == "backoffice":
             return redirect(url_for("cloud_backoffice_dashboard"))
         return redirect(url_for("default_gym_public_site"))
@@ -6105,15 +6134,18 @@ def cloud_backoffice_dashboard():
 
 @app.route("/salonmax-platform")
 def salonmax_platform():
-    return redirect(url_for("salonmax_owner_console"))
+    return redirect(url_for("salonmax_owner_gyms" if gym_only_cloud_deployment() else "salonmax_owner_console"))
 
 
 @app.route("/platform-login", methods=["GET", "POST"])
 def salonmax_platform_login():
     notice = ""
-    next_url = request.values.get("next", "/platform").strip() or "/platform"
+    default_next_url = "/platform/gyms" if gym_only_cloud_deployment() else "/platform"
+    next_url = request.values.get("next", default_next_url).strip() or default_next_url
     if not next_url.startswith("/") or next_url.startswith("//"):
-        next_url = "/platform"
+        next_url = default_next_url
+    if gym_only_cloud_deployment() and not gym_management_platform_path(next_url):
+        next_url = "/platform/gyms"
 
     configured_username = os.environ.get("SALONMAX_PLATFORM_ADMIN_USERNAME", "admin").strip() or "admin"
     configured_password = os.environ.get("SALONMAX_PLATFORM_ADMIN_PASSWORD", "").strip()
@@ -6134,7 +6166,7 @@ def salonmax_platform_login():
 
     return render_template(
         "platform_login.html",
-        title="Salon Max Platform Login",
+        title="GYM Max Admin Login" if gym_only_cloud_deployment() else "Salon Max Platform Login",
         notice=notice or request.args.get("notice", "").strip(),
         next_url=next_url,
         auth_configured=bool(configured_password),
@@ -6152,6 +6184,8 @@ def salonmax_platform_logout():
 @app.route("/platform")
 @app.route("/platform/owner")
 def salonmax_owner_console():
+    if gym_only_cloud_deployment():
+        return redirect(url_for("salonmax_owner_gyms"))
     return render_template(
         "salonmax_platform_accounts.html",
         snapshot=salonmax_business_accounts_snapshot(
@@ -6373,7 +6407,7 @@ def salonmax_owner_gyms_snapshot():
         })
 
     return {
-        "platform_name": "Salon Max",
+        "platform_name": "GYM Max" if gym_only_cloud_deployment() else "Salon Max",
         "business_count": len(rows),
         "ready_count": sum(1 for row in rows if row["terminal_count"]),
         "rows": rows,
@@ -6493,7 +6527,7 @@ def salonmax_owner_gyms():
     return render_template(
         "salonmax_gyms.html",
         snapshot=salonmax_owner_gyms_snapshot(),
-        title="Salon Max Gyms",
+        title="GYM Max Admin" if gym_only_cloud_deployment() else "Salon Max Gyms",
         notice=request.args.get("notice", "").strip(),
     )
 
