@@ -388,6 +388,11 @@ app.secret_key = os.environ.get("SALONMAX_SECRET_KEY", "salonmax-local-dev-secre
 LOCAL_TIMEZONE = ZoneInfo("Europe/London")
 
 
+@app.get("/healthz")
+def healthz():
+    return jsonify({"ok": True, "app_role": APP_ROLE, "product_mode": cloud_product_mode()})
+
+
 def env_path(name: str, default: Path) -> Path:
     raw_value = str(os.environ.get(name) or "").strip()
     return Path(raw_value) if raw_value else default
