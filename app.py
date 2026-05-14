@@ -414,6 +414,21 @@ def cloud_salon_backoffice_enabled() -> bool:
     return os.environ.get("SALONMAX_ENABLE_CLOUD_SALON_BACKOFFICE", "").strip() == "1"
 
 
+def cloud_product_mode() -> str:
+    explicit_mode = os.environ.get("SALONMAX_PRODUCT_MODE", "").strip().lower()
+    if explicit_mode:
+        return explicit_mode
+    if APP_ROLE == "cloud":
+        cloud_home = gym_product.cloud_home_target()
+        if cloud_home in {"default_gym", "gym", "kado"}:
+            return "gym"
+    return "salon"
+
+
+def gym_only_cloud_deployment() -> bool:
+    return APP_ROLE == "cloud" and cloud_product_mode() in {"gym", "kado"}
+
+
 def format_local_datetime(value) -> str:
     if not value:
         return ""
@@ -491,6 +506,14 @@ def require_platform_owner_login():
     protected_cloud_backoffice_path = APP_ROLE == "cloud" and any(
         path == prefix or path.startswith(f"{prefix}/") for prefix in SALON_BACKOFFICE_CLOUD_PATHS
     )
+    if gym_only_cloud_deployment() and (
+        protected_platform_path
+        or protected_cloud_backoffice_path
+        or path in {"/platform-login", "/platform-logout", "/salonmax-platform"}
+    ):
+        if request.method in {"GET", "HEAD"}:
+            return redirect(url_for("default_gym_public_site"))
+        return json_error("GYM_ONLY_DEPLOYMENT", "Salon Max platform routes are disabled on this gym deployment.", status=404)
     if not (protected_platform_path or protected_cloud_backoffice_path):
         return None
     if path in {"/platform-login", "/platform-logout"}:
@@ -763,7 +786,8 @@ def ensure_business_settings_table():
             smtp_use_tls integer not null default 1,
             email_reports_enabled integer not null default 0,
             auto_email_shift_reports integer not null default 1,
-            auto_email_daily_reports integer not null default 0
+            auto_email_daily_reports integer not null default 0,
+            hardware_controller_type text not null default 'pi_relay_board'
         )
         """
     )
@@ -789,6 +813,7 @@ def ensure_business_settings_table():
         "email_reports_enabled": "integer not null default 0",
         "auto_email_shift_reports": "integer not null default 1",
         "auto_email_daily_reports": "integer not null default 0",
+        "hardware_controller_type": "text not null default 'pi_relay_board'",
     }
     for column_name, column_sql in columns_to_add.items():
         if column_name not in existing_columns:
@@ -823,9 +848,10 @@ def ensure_business_settings_table():
             smtp_use_tls,
             email_reports_enabled,
             auto_email_shift_reports,
-            auto_email_daily_reports
+            auto_email_daily_reports,
+            hardware_controller_type
         )
-        select 1, 'Your Salon', 'GBP', 365, 3, 3, '', 'ultra_violet', '#155e75', '#1976d2', '#111111', '#ffffff', 0.65, 0.55, '10:00', '11:00', '20:00', '21:00', '', '', '', 587, '', '', 1, 0, 1, 0
+        select 1, 'Your Salon', 'GBP', 365, 3, 3, '', 'ultra_violet', '#155e75', '#1976d2', '#111111', '#ffffff', 0.65, 0.55, '10:00', '11:00', '20:00', '21:00', '', '', '', 587, '', '', 1, 0, 1, 0, 'pi_relay_board'
         where not exists (select 1 from business_settings where id = 1)
         """
     )
@@ -8215,6 +8241,15 @@ def update_business_settings():
     happy_hour_1_end = request.form.get("happy_hour_1_end", "11:00").strip() or "11:00"
     happy_hour_2_start = request.form.get("happy_hour_2_start", "20:00").strip() or "20:00"
     happy_hour_2_end = request.form.get("happy_hour_2_end", "21:00").strip() or "21:00"
+    hardware_controller_type = request.form.get("hardware_controller_type", "pi_relay_board").strip()
+    valid_hardware_controller_types = {
+        "pi_relay_board",
+        "pc_to_pi_relay_board",
+        "tmax_serial",
+        "manual",
+    }
+    if hardware_controller_type not in valid_hardware_controller_types:
+        hardware_controller_type = "pi_relay_board"
     management_report_emails = request.form.get("management_report_emails", "").strip()
     report_from_email = request.form.get("report_from_email", "").strip()
     smtp_host = request.form.get("smtp_host", "").strip()
@@ -8254,7 +8289,8 @@ def update_business_settings():
             smtp_use_tls = ?,
             email_reports_enabled = ?,
             auto_email_shift_reports = ?,
-            auto_email_daily_reports = ?
+            auto_email_daily_reports = ?,
+            hardware_controller_type = ?
         where id = 1
         """,
         (
@@ -8279,6 +8315,7 @@ def update_business_settings():
             email_reports_enabled,
             auto_email_shift_reports,
             auto_email_daily_reports,
+            hardware_controller_type,
         ),
     )
     return redirect(url_for("business_settings", notice="Business settings saved"))
