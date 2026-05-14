@@ -411,7 +411,11 @@ PLATFORM_DATABASE_PATH = env_path("SALONMAX_PLATFORM_DB_PATH", default_platform_
 
 
 def cloud_salon_backoffice_enabled() -> bool:
-    return os.environ.get("SALONMAX_ENABLE_CLOUD_SALON_BACKOFFICE", "").strip() == "1"
+    if os.environ.get("SALONMAX_ENABLE_CLOUD_SALON_BACKOFFICE", "").strip() != "1":
+        return False
+    if APP_ROLE != "cloud":
+        return True
+    return os.environ.get("SALONMAX_CLOUD_BACKOFFICE_MODE", "").strip().lower() == "single_tenant"
 
 
 def cloud_product_mode() -> str:

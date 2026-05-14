@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Salon Back Office Not Enabled</title>
+    <title>Legacy Salon Back Office Blocked</title>
     <style>
         body {
             margin: 0;
@@ -66,19 +66,20 @@
 <body>
     <main class="card">
         <div class="eyebrow">Salon Max Cloud</div>
-        <h1>Salon back office is not enabled on this deployment.</h1>
+        <h1>This is the old single-salon back office.</h1>
         <p>
-            This DigitalOcean app is currently being used for the KADO Fitness gym product.
-            The old salon back-office shell has been blocked here so gym and salon customer
-            systems do not get muddled together.
+            This page is not the Salon Max owner platform and it is not attached to one
+            selected customer business. It reads from one standalone back-office database,
+            so it can look like a random salon if old test data is present.
         </p>
         <p>
-            When we publish Salon Max back office properly, it should be a separate Salon Max
-            deployment/domain with its own database, not hidden inside the KADO app.
+            For cloud deployments we are blocking this legacy shell unless it is deliberately
+            enabled as a single-tenant back office. The proper cloud version should live under
+            a selected business account, for example a future business-specific back-office link.
         </p>
         <div class="actions">
             <a href="{{ url_for('salonmax_owner_console') }}">Open Salon Max Platform</a>
-            <a class="secondary" href="{{ url_for('default_gym_public_site') }}">Open KADO Fitness</a>
+            <a class="secondary" href="{{ url_for('salonmax_platform_login') }}">Provider Login</a>
         </div>
     </main>
 </body>
